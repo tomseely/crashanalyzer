@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Crash Log Analyzer</title>
+        <meta name="author" content="Thomas Seely">
+        <meta name="date" content="11/26/25">
+        <meta name="description" content="CS2104 Personal project of a website and python script that takes in a Minecraft crash log
+                                           and uses Google Gemini to analyze it and give feedback to the user">
+        
+    </head>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;font-size: 22px;
+        }   
+        #fileInput {
+            padding: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 4px;
+            border-color: black;
+            border-style: groove;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #000000;
+            color: #ffffff
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+    <body>
+        <h1>Minecraft Crash Log Analyzer</h1>
+        <b>Upload a Minecraft crash log and Google Gemini will analyze it and give feedback on what your problem is 
+            and how to resolve it to the best of its ability.</b>
+        
+        <div>
+            <input type="file" id="fileInput" accept=".txt,.log" />
+        </div>
+        <div>
+            <button onclick="uploadFile()">Analyze Crash Log</button>
+        </div>
+        
+        <div id="result">
+            <h2>Analysis Results:</h2>
+            <p id="analysisText"></p>
+        </div>
+
+        <script>
+            function uploadFile() {
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    alert('Please select a file first');
+                    return;
+                }
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                // Send to your backend (Python Flask/FastAPI server)
+                fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('analysisText').textContent = data.analysis;
+                    document.getElementById('result').style.display = 'block';
+                })
+                .catch(error => {
+                    alert('Error analyzing file: ' + error);
+                });
+            }
+        </script>
+    </body>
+</html>
