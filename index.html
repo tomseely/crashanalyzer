@@ -7,7 +7,7 @@
         <meta name="date" content="11/26/25">
         <meta name="description" content="CS2104 Personal project of a website and python script that takes in a Minecraft crash log
                                            and uses Google Gemini to analyze it and give feedback to the user">
-        
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     </head>
     <style>
         body {
@@ -39,6 +39,20 @@
             border-radius: 4px;
             display: none;
         }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #000000;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
     <body>
         <h1>Minecraft Crash Log Analyzer</h1>
@@ -52,9 +66,14 @@
             <button onclick="uploadFile()">Analyze Crash Log</button>
         </div>
         
+        <div id="loading" style="display: none; text-align: center; margin: 20px 0;">
+            <p>Analyzing crash log...</p>
+            <div class="spinner"></div>
+        </div>
+
         <div id="result">
             <h2>Analysis Results:</h2>
-            <p id="analysisText"></p>
+            <div id="analysisText"></div>
         </div>
 
         <script>
@@ -70,17 +89,39 @@
                 const formData = new FormData();
                 formData.append('file', file);
                 
-                // Send to your backend (Python Flask/FastAPI server)
-                fetch('/analyze', {
+                // Show loading indicator
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('result').style.display = 'none';
+                
+                fetch('http://localhost:5000/analyze', {
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    document.getElementById('analysisText').textContent = data.analysis;
+                    console.log('Data received:', data);
+                    // Hide loading indicator
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (data.error) {
+                        alert('Server error: ' + data.error);
+                        return;
+                    }
+                    // Convert markdown to HTML
+                    const htmlContent = marked.parse(data.analysis);
+                    document.getElementById('analysisText').innerHTML = htmlContent;
                     document.getElementById('result').style.display = 'block';
                 })
                 .catch(error => {
+                    console.error('Fetch error:', error);
+                    // Hide loading indicator on error
+                    document.getElementById('loading').style.display = 'none';
                     alert('Error analyzing file: ' + error);
                 });
             }
