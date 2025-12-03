@@ -16,10 +16,14 @@ def get_client():
 
 def analyze_crash(text: str, model: str = "gemini-2.5-pro") -> str:
     client = get_client()
+    with open("directive.txt", "r") as f:
+        directive = f.read()
     prompt = (
         "You are an expert Minecraft crash-log and general log analyzer that can identify issues "
         "within a person's Minecraft instance that causes their game to crash or have catastrophic errors.\n\n"
-        "Analyze the root cause of this crash concisely and provide concise instructions to resolve the error."
+        "Analyze the root cause of this crash concisely and provide concise instructions to resolve the error.\n"
+        "For better log analysis here are additional directives for common problems that pure log analysis may not find:\n"
+        + directive
     )
     response = client.models.generate_content(
         model=model,
