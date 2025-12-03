@@ -93,7 +93,7 @@
                 document.getElementById('loading').style.display = 'block';
                 document.getElementById('result').style.display = 'none';
                 
-                fetch('https://crashanalyzer.onrender.com/', {
+                fetch('https://crashanalyzer.onrender.com/analyze', {
                     method: 'POST',
                     body: formData
                 })
