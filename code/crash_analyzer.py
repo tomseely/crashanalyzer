@@ -2,13 +2,18 @@ from google import genai
 from google.genai import types
 import os
 
+# Get the absolute path of the current file
+file_path = os.path.abspath(__file__)
+
+# Extract the directory name from the file path
+directory_name = os.path.dirname(file_path)
 
 # gets Gemini client using API key from environment variable or through the hidden .apikey.txt file
 def get_client():
     key = os.getenv("GENAI_API_KEY")
     if not key:
         try:
-            with open("personal_project/crashanalyzer/.apikey.txt", "r") as f:
+            with open(directory_name + "/../.apikey.txt", "r") as f:
                 key = f.read().strip()
         except Exception:
             key = None
@@ -20,7 +25,7 @@ def get_client():
 # function that takes log file (text) to call Gemini API and returns its output
 def analyze_crash(text: str, model: str = "gemini-2.5-pro") -> str:
     client = get_client()
-    with open("personal_project/crashanalyzer/data/directive.txt", "r") as f:
+    with open(directory_name + "/../data/directive.txt", "r") as f:
         directive = f.read()
     prompt = (
         "You are an expert Minecraft crash-log and general log analyzer that can identify issues "
