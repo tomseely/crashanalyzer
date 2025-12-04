@@ -20,7 +20,7 @@ def get_client():
 # function that takes log file (text) to call Gemini API and returns its output
 def analyze_crash(text: str, model: str = "gemini-2.5-pro") -> str:
     client = get_client()
-    with open("data/directive.txt", "r") as f:
+    with open("personal_project/crashanalyzer/data/directive.txt", "r") as f:
         directive = f.read()
     prompt = (
         "You are an expert Minecraft crash-log and general log analyzer that can identify issues "
